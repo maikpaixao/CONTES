@@ -16,15 +16,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
+import sys
 import json, numpy, os
+from gensim.models import Word2Vec
+from utils import onto
+from utils import BioNLP_Format
+from module_predictor import main_predictor
+from utils import BioNLP_Format
+
+sys.path.append("..")
+from module_train import main_train
 
 #################################################
 # STEP 1: Training & Ontological embedding
 #################################################
 
 # Load an existing W2V model (Gensim format):
-from gensim.models import Word2Vec
 modelPath = "DATA/wordEmbeddings/VST_count0_size100_iter50.model" # the provided models are really small models, just to test execution
 filename, file_extension = os.path.splitext(modelPath)
 print("Loading word embeddings...")
@@ -47,11 +54,9 @@ attributions = json.load(attributionsFile)
 
 # Load an ontology for your task.
 # (If you had many with your own task, you can use Protégé software to merge them in one)
-from utils import onto
 ontobiotiope = onto.loadOnto("DATA/OntoBiotope_BioNLP-ST-2016.obo")
 
 # Building of concept embeddings and training:
-from module_train import main_train
 regMat, VSO, l_unknownTokens = main_train.train(word_vectors, dl_trainingTerms, attributions, ontobiotiope, factor=1.0)
 print("Unknown tokens (possibly tokens from labels of the ontology): "+str(l_unknownTokens))
 
@@ -61,7 +66,6 @@ print("Unknown tokens (possibly tokens from labels of the ontology): "+str(l_unk
 #################################################
 
 # Parsing of A1 files:
-from utils import BioNLP_Format
 a1Path = "DATA/BB-cat_dev" #"DATA/BB-cat_test"
 ddd_a1 = BioNLP_Format.parseA1(a1Path)
 
@@ -70,7 +74,6 @@ dl_terms, ddd_a1, errorsNumber = BioNLP_Format.getTermsFromA1(ddd_a1)
 print("Number of unreadable tokens: "+str(errorsNumber))
 
 # Prediction with precedent training model (see STEP 2):
-from module_predictor import main_predictor
 lt_predictions, l_unknownTokens = main_predictor.predictor(word_vectors, dl_terms, VSO, regMat, 'cosine')
 print("Unknown tokens in new mentions compare to W2V tokens: "+str(l_unknownTokens))
 
@@ -79,7 +82,6 @@ print("Unknown tokens in new mentions compare to W2V tokens: "+str(l_unknownToke
 #################################################
 
 # Create and write predictions in A2 files, put into the directory <<a2Path>>:
-from utils import BioNLP_Format
 a2Path = "../DEMO/DATA/predictedData"
 BioNLP_Format.writeA2(a2Path, lt_predictions, ddd_a1)
 
