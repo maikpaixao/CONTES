@@ -27,6 +27,8 @@ from utils import BioNLP_Format
 sys.path.append("..")
 from module_train import main_train
 
+sys.setrecursionlimit(100000)
+
 #################################################
 # STEP 1: Training & Ontological embedding
 #################################################

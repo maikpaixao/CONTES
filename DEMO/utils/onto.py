@@ -43,14 +43,12 @@ def loadOnto(ontoPath):
     onto = pronto.Ontology(ontoPath)
     return onto
 
-
-
 def ancestor_level(concept, level, levelmap):
     levelmap[concept.id] = level
-    for parent in concept.parents:
+    
+    for parent in concept.subclasses():
         ancestor_level(parent, level+1, levelmap)
     return levelmap
-
 
 def ontoToVec(onto, factor=1.0):
     """
@@ -63,14 +61,16 @@ def ontoToVec(onto, factor=1.0):
     size = len(onto)
     d_assoDim = dict()
 
-    for i, concept in enumerate(onto):
-        #print(onto[concept])
+    i = 0
+    for concept in onto.terms():
+        #print(concept)
         id_concept = concept.id
         vso[id_concept] = numpy.zeros(size)
         d_assoDim[id_concept] = i
+        i = i+1
         #vso[id_concept][d_assoDim[id_concept]] = 1
 
-    for concept in onto:
+    for concept in onto.terms():
         levelmap = ancestor_level(concept, 0, {})
         id_concept = concept.id
         for id_ancestor, level in levelmap.items():
