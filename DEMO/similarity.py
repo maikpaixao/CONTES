@@ -5,11 +5,23 @@ from utils import onto
 from utils import BioNLP_Format
 from module_predictor import main_predictor
 from utils import BioNLP_Format
+import spacy
 
 sys.path.append("..")
 from module_train import main_train
 
 sys.setrecursionlimit(100000)
+nlp = spacy.load("en_core_web_sm")
+
+def find_head(doc):
+  head = None
+  if len(doc) > 1:
+    for token in doc:
+              if token.text == token.head.text:
+                head = token.text
+  else:
+    head = list(doc[0])
+  return head
 
 # Automatic load of training data:
 mentionsFilePath = "DATA/trainingData/terms_trainObo.json"
@@ -34,6 +46,8 @@ with open('../DEMO/DATA/trainingData/attributions_train.json') as f:
 count = 0
 for key, value in onto_attributions.items():
         concept_id = onto_attributions[key][0]
+        doc = nlp(ontobiotiope[str(concept_id)].name)
         print(onto_terms[key], "-", ontobiotiope[str(concept_id)].name)
+        print("Head: ", find_head(doc))
 
 #print(onto_attributions['5d4a950'][0][4:])
