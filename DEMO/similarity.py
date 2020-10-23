@@ -55,9 +55,6 @@ print("Word embeddings loaded.\n")
 vstTerm, unknownTokens = word2term.wordVST2TermVST(word_vectors, dl_trainingTerms)
 #print("Unknown tokens (possibly tokens from labels of the ontology): "+str(unknownTokens))
 
-#print(model['yolk'])
-#print(len(unknownTokens))
-
 with open('../DEMO/DATA/trainingData/terms_train.json') as f:
   onto_terms = json.load(f)
 
