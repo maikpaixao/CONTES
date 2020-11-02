@@ -15,6 +15,10 @@ from module_train import main_train
 sys.setrecursionlimit(100000)
 nlp = spacy.load("en_core_web_sm")
 
+def calculate_similarity(term_1, term_2):
+        cosine = 1 - spatial.distance.cosine(term_1, term_2)
+        return cosine
+
 # Automatic load of training data:
 mentionsFilePath = "DATA/trainingData/terms_trainObo.json"
 attributionsFilePath = "DATA/trainingData/attributions_trainObo.json"
@@ -68,7 +72,9 @@ for key, value in onto_attributions.items():
         if((find_head(doc) in model.wv.vocab) and (onto_terms[key][0] in model.wv.vocab)):
           if(isinstance(onto_terms[key], list) and len(onto_terms[key]) > 1):
             #cosine similarity
-            cosine = 1 - spatial.distance.cosine(model[find_head(doc)], model[onto_terms[key][0]])
+            cosine = calculate_similarity(model[find_head(doc)], model[onto_terms[key][0]])
+            #cosine = 1 - spatial.distance.cosine(model[find_head(doc)], model[onto_terms[key][0]])
             print(cosine)
+
             #print("Heads: ", find_head(doc), onto_terms[key][0])
             #print(onto_terms[key], "-", ontobiotiope[str(concept_id)].name)
